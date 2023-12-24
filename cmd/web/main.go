@@ -28,16 +28,9 @@ func main() {
 		infoLog:  infoLog,
 	}
 
-	//Aqui instanciamos el ServerMux; su función es mapear el patrón
+	//Aqua instanciamos el ServerMux; su función es mapear el patrón
 	// URL con la función.
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/snippet", app.show)
-	mux.HandleFunc("/snippet/create", app.create)
-
-	//Manejo y response de archivos estáticos creando un directorio
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+	mux := app.routes()
 
 	//Creamos el objeto servidor con las direcciones, mensaje de error y handler
 	srv := &http.Server{
