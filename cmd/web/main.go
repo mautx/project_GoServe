@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Snipperclips/pkg/models/mysql"
 	"database/sql"
 	"flag"
 	_ "github.com/go-sql-driver/mysql"
@@ -12,6 +13,7 @@ import (
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
+	snippets *mysql.SnippetModel
 }
 
 func main() {
@@ -23,7 +25,7 @@ func main() {
 
 	flag.Parse()
 
-	//Infolog es un mensaje que aparece en terminal con informacion relevante
+	//Info log es un mensaje que aparece en terminal con información relevante
 	infoLog := log.New(os.Stdout, "INFO---\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR---\t", log.Ldate|log.Ltime|log.Lshortfile)
 	db, err := openDB(*dsn)
@@ -41,6 +43,7 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
+		snippets: &mysql.SnippetModel{DB: db},
 	}
 
 	//Aqua instanciamos el ServerMux; su función es mapear el patrón

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -43,7 +44,16 @@ func (app *application) show(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-	fmt.Fprintf(w, "Mostrando snippet %d", id)
+
+	s, err := app.snippets.Get(id)
+	if err == sql.ErrNoRows {
+		app.notFound(w)
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	fmt.Fprintf(w, "%v", s)
 
 }
 
@@ -54,4 +64,17 @@ func (app *application) create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not alowe", 405)
 		return
 	}
+
+	title := "Pancho cachondo"
+	content := "Las aventuras de pancho cachondo"
+	expires := "7"
+
+	id, err := app.snippets.Insert(title, content, expires)
+
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	http.Redirect(w, r, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
+
 }
